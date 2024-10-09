@@ -3,6 +3,7 @@ import os
 import platform
 import subprocess
 from pathlib import Path
+import shlex
 
 import torch
 from setuptools import Extension
@@ -141,6 +142,9 @@ class CMakeBuild(build_ext):
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",
             f"-DUSE_FFMPEG:BOOL={'ON' if _USE_FFMPEG else 'OFF'}",
         ]
+        if "CMAKE_ARGS" in os.environ:
+            cmake_args += shlex.split(os.environ["CMAKE_ARGS"])
+
         build_args = ["--target", "install"]
         # Pass CUDA architecture to cmake
         if _TORCH_CUDA_ARCH_LIST is not None:
